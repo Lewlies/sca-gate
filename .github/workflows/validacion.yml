@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+# dos ejecuciones a la vez provocan el 429 de Maven Central
+concurrency: validacion
+
 jobs:
   pruebas:
     runs-on: ubuntu-24.04
@@ -24,7 +27,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      max-parallel: 4  # Maven Central limita si se lanzan muchos a la vez
+      max-parallel: 3  # Maven Central limita si se lanzan muchos a la vez
       matrix:
         include:
           - { repo: synthetic-npm-mixed, sha: 441e477f26584c9c57f4aae4bb335560b4df9cc4 }

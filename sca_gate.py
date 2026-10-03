@@ -381,6 +381,9 @@ def ultima_linea(texto):
     causas = [l[2:] for l in lineas if l.startswith("* ")]
     if causas:
         return causas[-1][:250]
+    fatal = [i for i, l in enumerate(lineas) if "FATAL" in l]
+    if fatal and fatal[0] + 1 < len(lineas):
+        return lineas[fatal[0] + 1].lstrip("- ")[:250]
     for l in reversed(lineas):
         if re.search(r"FATAL|ERROR|[Ee]rror", l):
             return l[:250]

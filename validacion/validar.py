@@ -48,11 +48,14 @@ def comprobar(dir_informe, repo):
     res["decision_gate"] = decision(g["nivel"] for g in grupos)
 
     fuentes = Path(dir_informe) / "fuentes"
-    if not (fuentes / "kev.json").is_file() or not (fuentes / "epss_scores.csv.gz").is_file():
-        return {**res, "veredicto": "NO_CONCLUYENTE", "motivo": "no hay instantanea de EPSS o KEV"}
     cves = {i for p in esperado["presentes"] for i in p["ids"] if i.startswith("CVE-")}
-    kev, _ = sca_gate.cargar_kev(fuentes / "kev.json", fuentes)
-    epss, _ = sca_gate.cargar_epss(cves, fuentes / "epss_scores.csv.gz", fuentes)
+    kev, epss = {}, {}
+    if cves:
+        # si la puerta no encontro ningun CVE no descargo instantanea, y entonces no hace falta
+        if not (fuentes / "kev.json").is_file() or not (fuentes / "epss_scores.csv.gz").is_file():
+            return {**res, "veredicto": "NO_CONCLUYENTE", "motivo": "no hay instantanea de EPSS o KEV"}
+        kev, _ = sca_gate.cargar_kev(fuentes / "kev.json", fuentes)
+        epss, _ = sca_gate.cargar_epss(cves, fuentes / "epss_scores.csv.gz", fuentes)
 
     niveles, no_vistos = [], []
     for p in esperado["presentes"]:
