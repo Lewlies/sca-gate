@@ -1,0 +1,797 @@
+{
+ "_comentario": "Generado por validacion/generar_esperado.py desde los ground_truth.yaml del TFG. No editar a mano.",
+ "repos": [
+  {
+   "repo": "synthetic-npm-mixed",
+   "ecosistema": "npm",
+   "sha": "441e477f26584c9c57f4aae4bb335560b4df9cc4",
+   "presentes": [
+    {
+     "paquete": "minimist",
+     "version": "1.2.2",
+     "ids": [
+      "CVE-2020-7598",
+      "GHSA-vh95-rmgr-6w4m"
+     ],
+     "tipo": "objetivo",
+     "id_finding": "mixed-npm-01-directa"
+    },
+    {
+     "paquete": "minimist",
+     "version": "1.2.2",
+     "ids": [
+      "CVE-2021-44906",
+      "GHSA-xvch-5gv4-984h"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-01-directa"
+    },
+    {
+     "paquete": "minimist",
+     "version": "0.0.8",
+     "ids": [
+      "CVE-2020-7598",
+      "GHSA-vh95-rmgr-6w4m"
+     ],
+     "tipo": "objetivo",
+     "id_finding": "mixed-npm-02-transitiva"
+    },
+    {
+     "paquete": "minimist",
+     "version": "0.0.8",
+     "ids": [
+      "CVE-2021-44906",
+      "GHSA-xvch-5gv4-984h"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-02-transitiva"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-xj6q-8x83-jv6g",
+      "CVE-2026-67314"
+     ],
+     "tipo": "objetivo",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-hcpx-6fm6-wx23"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-mmx7-hfxf-jppx"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-pmv8-rq9r-6j72"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-mwf2-3pr3-8698"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-gcfj-64vw-6mp9"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-7q8q-rj6j-mhjq"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-jqh4-m9w3-8hp9"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-f4gw-2p7v-4548"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    },
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-42h9-826w-cgv3"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-npm-03-disputada"
+    }
+   ],
+   "ausentes": [
+    {
+     "paquete": "axios",
+     "version": "1.16.0",
+     "ids": [
+      "GHSA-38gx-cfqf-f652"
+     ],
+     "motivo": "advisory retirada"
+    }
+   ],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-npm-boundary-vulnerable",
+   "ecosistema": "npm",
+   "sha": "72cd9db91147d5918e9031f4c37d8a8431026087",
+   "presentes": [
+    {
+     "paquete": "lodash",
+     "version": "4.17.11",
+     "ids": [
+      "CVE-2019-10744",
+      "GHSA-jf85-cpcp-j695",
+      "SNYK-JS-LODASH-450202"
+     ],
+     "tipo": "objetivo",
+     "id_finding": "boundary-npm-vuln-01"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.11",
+     "ids": [
+      "CVE-2020-8203",
+      "GHSA-p6mc-m468-83gw"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.11",
+     "ids": [
+      "CVE-2021-23337",
+      "GHSA-35jh-r3h4-6jhm"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.11",
+     "ids": [
+      "CVE-2020-28500",
+      "GHSA-29mw-wpgm-hmr9"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.11",
+     "ids": [
+      "CVE-2026-4800",
+      "GHSA-r5fr-rjxr-66jc"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.11",
+     "ids": [
+      "CVE-2026-2950",
+      "GHSA-f23m-r3pf-42rh"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.11",
+     "ids": [
+      "CVE-2025-13465",
+      "GHSA-xxjr-mmjv-4gpg"
+     ],
+     "tipo": "compartido"
+    }
+   ],
+   "ausentes": [],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-npm-boundary-patched",
+   "ecosistema": "npm",
+   "sha": "9f3c76819079672cfa76a6039e358225994611f0",
+   "presentes": [
+    {
+     "paquete": "lodash",
+     "version": "4.17.12",
+     "ids": [
+      "CVE-2020-8203",
+      "GHSA-p6mc-m468-83gw"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.12",
+     "ids": [
+      "CVE-2021-23337",
+      "GHSA-35jh-r3h4-6jhm"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.12",
+     "ids": [
+      "CVE-2020-28500",
+      "GHSA-29mw-wpgm-hmr9"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.12",
+     "ids": [
+      "CVE-2026-4800",
+      "GHSA-r5fr-rjxr-66jc"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.12",
+     "ids": [
+      "CVE-2026-2950",
+      "GHSA-f23m-r3pf-42rh"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "lodash",
+     "version": "4.17.12",
+     "ids": [
+      "CVE-2025-13465",
+      "GHSA-xxjr-mmjv-4gpg"
+     ],
+     "tipo": "compartido"
+    }
+   ],
+   "ausentes": [
+    {
+     "paquete": "lodash",
+     "version": "4.17.12",
+     "ids": [
+      "CVE-2019-10744",
+      "GHSA-jf85-cpcp-j695",
+      "SNYK-JS-LODASH-450202"
+     ],
+     "motivo": "borde parcheado"
+    }
+   ],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-npm-control",
+   "ecosistema": "npm",
+   "sha": "7a81aec1b1f20675c608d251dfabae7866f987ab",
+   "presentes": [],
+   "ausentes": [],
+   "fecha_verificacion": "2026-08-16"
+  },
+  {
+   "repo": "synthetic-pypi-mixed",
+   "ecosistema": "pypi",
+   "sha": "116d94a2363576869fdd45a6f70136cc7031feb4",
+   "presentes": [
+    {
+     "paquete": "pyyaml",
+     "version": "5.3.1",
+     "ids": [
+      "CVE-2020-14343",
+      "GHSA-8q59-q68h-6hv4",
+      "PYSEC-2021-142"
+     ],
+     "tipo": "esperado",
+     "id_finding": "mixed-pypi-01-directa"
+    },
+    {
+     "paquete": "pyopenssl",
+     "version": "23.2.0",
+     "ids": [
+      "CVE-2026-27459",
+      "GHSA-5pwr-322w-8jr4",
+      "PYSEC-2026-2269"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-02-transitiva"
+    },
+    {
+     "paquete": "pyopenssl",
+     "version": "23.2.0",
+     "ids": [
+      "CVE-2026-27448",
+      "GHSA-vp96-hxj8-p424",
+      "PYSEC-2026-2268"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-02-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "CVE-2024-26130",
+      "GHSA-6vqw-3v5j-54x4",
+      "PYSEC-2024-225"
+     ],
+     "tipo": "objetivo",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "CVE-2023-50782",
+      "GHSA-3ww4-gg4f-jr7f"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "CVE-2024-0727",
+      "GHSA-9v9h-cgj8-h64p"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "CVE-2026-26007",
+      "GHSA-r6ph-v2qm-q3c2"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "CVE-2026-34073",
+      "GHSA-m959-cc7f-wv43"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "CVE-2026-69248",
+      "GHSA-m2h6-j472-rp4c"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "CVE-2026-69249",
+      "GHSA-jwv3-5hgf-82ww"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "GHSA-h4gh-qq45-vh27"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    },
+    {
+     "paquete": "cryptography",
+     "version": "41.0.7",
+     "ids": [
+      "GHSA-537c-gmf6-5ccf"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-pypi-03-transitiva"
+    }
+   ],
+   "ausentes": [
+    {
+     "paquete": "future",
+     "version": "1.0.0",
+     "ids": [
+      "GHSA-xqrq-4mgf-ff32",
+      "CVE-2025-50817"
+     ],
+     "motivo": "advisory retirada"
+    }
+   ],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-pypi-boundary-vulnerable",
+   "ecosistema": "pypi",
+   "sha": "5b636b74ed197bc4b1fb69df6ec1493012fb5776",
+   "presentes": [
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2021-33503",
+      "GHSA-q2q7-5pp4-w6pg",
+      "PYSEC-2021-108"
+     ],
+     "tipo": "objetivo",
+     "id_finding": "boundary-pypi-vuln-01"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2023-43804",
+      "GHSA-v845-jxx5-vc9f",
+      "PYSEC-2023-192"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2023-45803",
+      "GHSA-g4mx-q9vg-27p4",
+      "PYSEC-2023-212"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2024-37891",
+      "GHSA-34jh-p97f-mpxf"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2025-50181",
+      "GHSA-pq67-6m6q-mj2v"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2025-66418",
+      "GHSA-gm62-xv2j-4w53"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2025-66471",
+      "GHSA-2xpw-w6gg-jr37"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2026-21441",
+      "GHSA-38jv-5279-wg99"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.4",
+     "ids": [
+      "CVE-2026-44431",
+      "GHSA-qccp-gfcp-xxvc"
+     ],
+     "tipo": "compartido"
+    }
+   ],
+   "ausentes": [],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-pypi-boundary-patched",
+   "ecosistema": "pypi",
+   "sha": "b6a9f4475e35356b9dfa8cd1b39e69151b4a2091",
+   "presentes": [
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2023-43804",
+      "GHSA-v845-jxx5-vc9f",
+      "PYSEC-2023-192"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2023-45803",
+      "GHSA-g4mx-q9vg-27p4",
+      "PYSEC-2023-212"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2024-37891",
+      "GHSA-34jh-p97f-mpxf"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2025-50181",
+      "GHSA-pq67-6m6q-mj2v"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2025-66418",
+      "GHSA-gm62-xv2j-4w53"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2025-66471",
+      "GHSA-2xpw-w6gg-jr37"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2026-21441",
+      "GHSA-38jv-5279-wg99"
+     ],
+     "tipo": "compartido"
+    },
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2026-44431",
+      "GHSA-qccp-gfcp-xxvc"
+     ],
+     "tipo": "compartido"
+    }
+   ],
+   "ausentes": [
+    {
+     "paquete": "urllib3",
+     "version": "1.26.5",
+     "ids": [
+      "CVE-2021-33503"
+     ],
+     "motivo": "borde parcheado"
+    }
+   ],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-pypi-control",
+   "ecosistema": "pypi",
+   "sha": "fedb99cf6855b196abbcdc348f68dbfe986e7452",
+   "presentes": [],
+   "ausentes": [],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-maven-mixed",
+   "ecosistema": "maven",
+   "sha": "6706595ef24ed88e86b7eb823325393fc5f4d98f",
+   "presentes": [
+    {
+     "paquete": "org.apache.logging.log4j:log4j-core",
+     "version": "2.14.1",
+     "ids": [
+      "CVE-2021-44228",
+      "GHSA-jfh8-c2jp-5v3q"
+     ],
+     "tipo": "esperado",
+     "id_finding": "mixed-maven-01-directa"
+    },
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.23",
+     "ids": [
+      "CVE-2017-18640",
+      "GHSA-rvwf-54qp-4r6v"
+     ],
+     "tipo": "objetivo",
+     "id_finding": "mixed-maven-03-transitiva"
+    },
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.23",
+     "ids": [
+      "CVE-2022-1471",
+      "GHSA-mjmj-j48q-9wg2"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-maven-03-transitiva"
+    },
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.23",
+     "ids": [
+      "CVE-2022-25857",
+      "GHSA-3mc7-4q67-w48m"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-maven-03-transitiva"
+    },
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.23",
+     "ids": [
+      "CVE-2022-38750",
+      "GHSA-hhhw-99gj-p3c3"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-maven-03-transitiva"
+    },
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.23",
+     "ids": [
+      "CVE-2022-38751",
+      "GHSA-98wm-3w3q-mw94"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-maven-03-transitiva"
+    },
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.23",
+     "ids": [
+      "CVE-2022-38752",
+      "GHSA-9w3m-gqgf-c4p9"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-maven-03-transitiva"
+    },
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.23",
+     "ids": [
+      "CVE-2022-41854",
+      "GHSA-w37g-rhq8-7m4j"
+     ],
+     "tipo": "adicional",
+     "id_finding": "mixed-maven-03-transitiva"
+    },
+    {
+     "paquete": "org.jboss.resteasy:resteasy-core",
+     "version": "4.7.7.Final",
+     "ids": [
+      "CVE-2023-0482",
+      "GHSA-2c6g-pfx3-w7h8"
+     ],
+     "tipo": "esperado",
+     "id_finding": "mixed-maven-04-disputada"
+    }
+   ],
+   "ausentes": [
+    {
+     "paquete": "org.jboss.resteasy:resteasy-core",
+     "version": "4.7.7.Final",
+     "ids": [
+      "GHSA-jrmh-v64j-mjm9"
+     ],
+     "motivo": "advisory retirada"
+    }
+   ],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-maven-boundary-vulnerable",
+   "ecosistema": "maven",
+   "sha": "2754a5a827d3a5de20b23369234158042992b31c",
+   "presentes": [
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "1.33",
+     "ids": [
+      "CVE-2022-1471",
+      "GHSA-mjmj-j48q-9wg2"
+     ],
+     "tipo": "esperado",
+     "id_finding": "boundary-maven-vuln-01"
+    }
+   ],
+   "ausentes": [],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-maven-boundary-patched",
+   "ecosistema": "maven",
+   "sha": "54e109b2c5cb3ec6a4632c2af998babcd59f50db",
+   "presentes": [],
+   "ausentes": [
+    {
+     "paquete": "org.yaml:snakeyaml",
+     "version": "2.0",
+     "ids": [
+      "CVE-2022-1471"
+     ],
+     "motivo": "borde parcheado"
+    }
+   ],
+   "fecha_verificacion": "2026-09-02"
+  },
+  {
+   "repo": "synthetic-maven-control",
+   "ecosistema": "maven",
+   "sha": "765f34d27042e7fcb435d5a28f3281991137aaa7",
+   "presentes": [],
+   "ausentes": [],
+   "fecha_verificacion": "2026-09-02"
+  }
+ ]
+}

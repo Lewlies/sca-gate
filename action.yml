@@ -1,0 +1,99 @@
+name: sca-gate
+description: Escanea las dependencias con Trivy y OSV-Scanner y decide con una politica basada en CISA KEV y EPSS.
+author: Unai Cartagena
+
+inputs:
+  ruta:
+    description: Directorio a escanear
+    default: "."
+  ruta-base:
+    description: Checkout de la rama base. Si se indica, solo bloquea lo que introduce la PR
+    default: ""
+  herramientas:
+    description: trivy, osv-scanner y/o dependency-check, separadas por comas
+    default: "trivy,osv-scanner"
+  epss-bloqueo:
+    default: "0.1"
+  epss-aviso:
+    default: "0.01"
+  excepciones:
+    description: Fichero de excepciones que se aplica (en una PR, el de la rama base)
+    default: ".sca-excepciones.toml"
+  excepciones-propuestas:
+    description: Fichero de excepciones de la PR, solo se muestra
+    default: ""
+  fallo-herramienta:
+    description: error (falla cerrada) o aviso
+    default: "error"
+  modo:
+    description: bloquear o avisar
+    default: "bloquear"
+  nvd-api-key:
+    default: ""
+  dc-datos:
+    description: Directorio de la base de datos de Dependency-Check, para cachearla
+    default: ""
+  artefacto:
+    default: "sca-gate-informe"
+
+outputs:
+  decision:
+    description: PASA, AVISO, BLOQUEA o ERROR
+    value: ${{ steps.decidir.outputs.decision }}
+
+runs:
+  using: composite
+  steps:
+    - name: Instalar herramientas
+      shell: bash
+      env:
+        HERRAMIENTAS: ${{ inputs.herramientas }}
+      run: python3 "$GITHUB_ACTION_PATH/sca_gate.py" instalar --dir "$RUNNER_TEMP/sca-gate" --herramientas "$HERRAMIENTAS"
+
+    - name: Escanear
+      shell: bash
+      env:
+        NVD_API_KEY: ${{ inputs.nvd-api-key }}
+        RUTA: ${{ inputs.ruta }}
+        RUTA_BASE: ${{ inputs.ruta-base }}
+        HERRAMIENTAS: ${{ inputs.herramientas }}
+        DC_DATOS: ${{ inputs.dc-datos }}
+      run: |
+        gate="$GITHUB_ACTION_PATH/sca_gate.py"
+        bin="$RUNNER_TEMP/sca-gate/bin"
+        python3 "$gate" escanear --ruta "$RUTA" --salida "$RUNNER_TEMP/informe" --bin "$bin" --herramientas "$HERRAMIENTAS" ${DC_DATOS:+--dc-datos "$DC_DATOS"}
+        if [ -n "$RUTA_BASE" ]; then
+          python3 "$gate" escanear --ruta "$RUTA_BASE" --salida "$RUNNER_TEMP/informe/base" --bin "$bin" --herramientas "$HERRAMIENTAS" ${DC_DATOS:+--dc-datos "$DC_DATOS"}
+        fi
+
+    - name: Decidir
+      id: decidir
+      shell: bash
+      env:
+        RUTA_BASE: ${{ inputs.ruta-base }}
+        EXCEPCIONES: ${{ inputs.excepciones }}
+        PROPUESTAS: ${{ inputs.excepciones-propuestas }}
+        EPSS_BLOQUEO: ${{ inputs.epss-bloqueo }}
+        EPSS_AVISO: ${{ inputs.epss-aviso }}
+        FALLO: ${{ inputs.fallo-herramienta }}
+        MODO: ${{ inputs.modo }}
+      run: |
+        set +e
+        python3 "$GITHUB_ACTION_PATH/sca_gate.py" decidir --salida "$RUNNER_TEMP/informe" \
+          ${RUTA_BASE:+--base "$RUNNER_TEMP/informe/base"} ${EXCEPCIONES:+--excepciones "$EXCEPCIONES"} ${PROPUESTAS:+--propuestas "$PROPUESTAS"} \
+          --epss-bloqueo "$EPSS_BLOQUEO" --epss-aviso "$EPSS_AVISO" --fallo-herramienta "$FALLO" --modo "$MODO"
+        echo "codigo=$?" >> "$GITHUB_OUTPUT"
+
+    - name: Subir informe
+      if: always()
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artefacto }}
+        path: ${{ runner.temp }}/informe
+
+    - name: Resultado
+      if: always()
+      shell: bash
+      env:
+        CODIGO: ${{ steps.decidir.outputs.codigo }}
+      run: exit "${CODIGO:-1}"

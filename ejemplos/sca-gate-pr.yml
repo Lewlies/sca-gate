@@ -1,0 +1,50 @@
+# Copiar en .github/workflows/ y cambiar SHA_DE_SCA_GATE por el commit revisado de sca-gate.
+# Marcar "sca-gate / escanear" como comprobacion obligatoria en la proteccion de la rama.
+name: sca-gate
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  escanear:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: pr
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - uses: Lewlies/sca-gate@SHA_DE_SCA_GATE
+        with:
+          ruta: pr
+          ruta-base: base
+          # las excepciones se leen de la rama base para que la PR no pueda eximirse a si misma
+          excepciones: base/.sca-excepciones.toml
+          excepciones-propuestas: pr/.sca-excepciones.toml
+
+  # job aparte con permiso de escritura y sin el codigo de la PR
+  comentar:
+    needs: escanear
+    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          name: sca-gate-informe
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          [ -f informe.md ] || echo "sca-gate no llego a generar el informe, revisa el job escanear" > informe.md
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file informe.md --edit-last --create-if-none

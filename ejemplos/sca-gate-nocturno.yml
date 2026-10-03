@@ -1,0 +1,61 @@
+# Escaneo diario de la rama principal con Dependency-Check ademas de Trivy y OSV-Scanner.
+# Abre una incidencia si bloquea y la cierra cuando deja de bloquear. Necesita el secreto NVD_API_KEY.
+name: sca-gate-nocturno
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  escanear:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      decision: ${{ steps.gate.outputs.decision }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/dependency-check
+          key: dc-${{ github.run_id }}
+          restore-keys: dc-
+      - id: gate
+        uses: Lewlies/sca-gate@SHA_DE_SCA_GATE
+        with:
+          herramientas: trivy,osv-scanner,dependency-check
+          nvd-api-key: ${{ secrets.NVD_API_KEY }}
+          dc-datos: ~/.cache/dependency-check
+
+  incidencia:
+    needs: escanear
+    if: always()
+    runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          name: sca-gate-informe
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DECISION: ${{ needs.escanear.outputs.decision || 'ERROR' }}
+        run: |
+          [ -f informe.md ] || echo "sca-gate no llego a generar el informe, revisa el job escanear" > informe.md
+          abierta=$(gh issue list --state open --search "sca-gate nocturno in:title" --json number --jq '.[0].number')
+          if [ "$DECISION" = "BLOQUEA" ] || [ "$DECISION" = "ERROR" ]; then
+            if [ -n "$abierta" ]; then
+              gh issue edit "$abierta" --body-file informe.md
+            else
+              gh issue create --title "sca-gate nocturno $DECISION" --body-file informe.md
+            fi
+          elif [ -n "$abierta" ]; then
+            gh issue close "$abierta" --comment "La ultima ejecucion nocturna da $DECISION."
+          fi
