@@ -193,7 +193,7 @@ def entorno_sin_secretos():
 
 
 def correr(cmd, salida, nombre, cwd, env, timeout):
-    t0 = time.time()
+    t0 = time.monotonic()
     reg = {"comando": [str(c) for c in cmd], "codigo": None, "error": None}
     try:
         with open(salida / f"{nombre}.stdout.txt", "wb") as o, open(salida / f"{nombre}.stderr.txt", "wb") as e:
@@ -203,7 +203,7 @@ def correr(cmd, salida, nombre, cwd, env, timeout):
         reg["error"] = f"timeout tras {timeout} s"
     except OSError as e:
         reg["error"] = f"no se pudo ejecutar ({e})"
-    reg["segundos"] = round(time.time() - t0, 1)
+    reg["segundos"] = round(time.monotonic() - t0, 1)
     return reg
 
 
@@ -460,9 +460,10 @@ def agrupar(hallazgos, osv=None):
     for h in hallazgos:
         clave = (raiz(h["id"]), h["eco"], h["paquete"], h["version"])
         g = grupos.setdefault(clave, {"eco": h["eco"], "paquete": h["paquete"], "version": h["version"],
-                                      "ids": set(), "herramientas": set(), "ficheros": set(), "dev": [],
+                                      "ids": set(), "reportados": set(), "herramientas": set(), "ficheros": set(), "dev": [],
                                       "retirada": [], "severidad": None})
         g["ids"] |= {h["id"]} | h["alias"] | set((osv.get(h["id"]) or {}).get("alias", []))
+        g["reportados"].add(h["id"])
         g["herramientas"].add(h["herramienta"])
         g["ficheros"].add(h["fichero"])
         g["dev"].append(h["dev"])
@@ -473,7 +474,9 @@ def agrupar(hallazgos, osv=None):
         g["dev"] = all(d is True for d in g["dev"])
         g["retirada"] = all(g["retirada"])
         g["cves"] = sorted(i for i in g["ids"] if re.match(r"^CVE-\d{4}-\d+$", i))
-        g["id"] = g["cves"][0] if g["cves"] else min(g["ids"])
+        # se muestra el CVE que dio la propia herramienta; los alias de OSV pueden unir CVE distintos
+        directos = sorted(i for i in g["reportados"] if i in g["cves"])
+        g["id"] = (directos or g["cves"] or [min(g["reportados"])])[0]
     return list(grupos.values())
 
 
@@ -521,6 +524,7 @@ def clasificar(g, pol, excepciones=(), hoy=None):
     exc = next((e for e in excepciones if e["id"] in g["ids"] and e["caduca"] >= hoy
                 and (not e.get("paquete") or g["paquete"].split(":")[-1] == e["paquete"].lower())), None)
     epss = g.get("epss")
+    origen = f" de {g['epss_cve']}" if g.get("epss_cve") and g["epss_cve"] != g.get("id") else ""
     if g["retirada"]:
         nivel, motivo = "RETIRADA", "aviso retirado en OSV"
     elif exc:
@@ -536,11 +540,11 @@ def clasificar(g, pol, excepciones=(), hoy=None):
         nivel, motivo = "AVISO", "CVE sin puntuacion EPSS todavia"
     elif epss >= pol["epss_bloqueo"]:
         nivel = "AVISO" if g["dev"] else "BLOQUEO"
-        motivo = f"EPSS {decimal(epss)}" + (" en dependencia de desarrollo" if g["dev"] else "")
+        motivo = f"EPSS {decimal(epss)}{origen}" + (" en dependencia de desarrollo" if g["dev"] else "")
     elif epss >= pol["epss_aviso"]:
-        nivel, motivo = "AVISO", f"EPSS {decimal(epss)}"
+        nivel, motivo = "AVISO", f"EPSS {decimal(epss)}{origen}"
     else:
-        nivel, motivo = "INFO", f"EPSS {decimal(epss)}"
+        nivel, motivo = "INFO", f"EPSS {decimal(epss)}{origen}"
     # en modo diferencial solo bloquea lo que introduce la PR
     if nivel == "BLOQUEO" and g.get("preexistente"):
         nivel, motivo = "AVISO", motivo + ", ya estaba en la rama base"
@@ -622,8 +626,8 @@ def decidir(a):
         try:
             epss, meta["epss"] = cargar_epss(cves, a.epss_fichero, fuentes)
             for g in grupos:
-                puntos = [epss[c] for c in g["cves"] if c in epss]
-                g["epss"] = max(puntos) if puntos else None
+                puntos = [(epss[c], c) for c in g["cves"] if c in epss]
+                g["epss"], g["epss_cve"] = max(puntos) if puntos else (None, None)
         except Exception as e:
             errores_fuentes.append(f"EPSS no disponible ({e})")
 
@@ -644,7 +648,7 @@ def decidir(a):
     resultado = {"decision": decision, "motivo": motivo, "politica": pol, "herramientas": saludes,
                  "fuentes": meta, "sin_cobertura": sin_cobertura, "avisos": avisos + errores_fuentes,
                  "corregidas": sorted({f"{c['id']} {c['paquete']}@{c['version']}" for c in corregidas}),
-                 "grupos": [{**g, "ids": sorted(g["ids"]), "herramientas": sorted(g["herramientas"]),
+                 "grupos": [{**g, "ids": sorted(g["ids"]), "reportados": sorted(g["reportados"]), "herramientas": sorted(g["herramientas"]),
                              "ficheros": sorted(f for f in g["ficheros"] if f)} for g in grupos]}
     (salida / "informe.json").write_text(json.dumps(resultado, indent=1, ensure_ascii=False, default=str))
 
