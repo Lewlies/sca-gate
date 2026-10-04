@@ -597,11 +597,15 @@ def decidir(a):
         avisos.append("la API de OSV no respondio para algunos identificadores, se usan solo los alias de las herramientas")
 
     grupos = agrupar(hallazgos, osv)
+    corregidas = []
     if base:
+        def mismo(a, b):
+            return a["eco"] == b["eco"] and a["paquete"] == b["paquete"] and bool(a["ids"] & b["ids"])
         grupos_base = agrupar(base[1], osv)
         for g in grupos:
-            g["preexistente"] = any(b["eco"] == g["eco"] and b["paquete"] == g["paquete"] and b["ids"] & g["ids"]
-                                    for b in grupos_base)
+            g["preexistente"] = any(mismo(g, b) for b in grupos_base)
+        # lo que estaba en la base y ya no esta, por ejemplo tras una PR de Dependabot
+        corregidas = [b for b in grupos_base if not b["retirada"] and not any(mismo(b, g) for g in grupos)]
         for h, s in base[2].items():
             if s["estado"] == FALLO:
                 errores_fuentes.append(f"{h} fallo en la rama base ({s['motivo']})")
@@ -634,11 +638,12 @@ def decidir(a):
     avisos += [f"{c} no se aplica; las exclusiones van en .sca-excepciones.toml" for c in configs]
     decision, motivo = decision_global(saludes, grupos, sin_cobertura, avisos, errores_fuentes, pol)
 
-    texto = informe_md(decision, motivo, saludes, grupos, sin_cobertura, avisos, errores_fuentes,
+    texto = informe_md(decision, motivo, saludes, grupos, corregidas, sin_cobertura, avisos, errores_fuentes,
                        propuestas, meta, pol, bool(base))
     (salida / "informe.md").write_text(texto)
     resultado = {"decision": decision, "motivo": motivo, "politica": pol, "herramientas": saludes,
                  "fuentes": meta, "sin_cobertura": sin_cobertura, "avisos": avisos + errores_fuentes,
+                 "corregidas": sorted({f"{c['id']} {c['paquete']}@{c['version']}" for c in corregidas}),
                  "grupos": [{**g, "ids": sorted(g["ids"]), "herramientas": sorted(g["herramientas"]),
                              "ficheros": sorted(f for f in g["ficheros"] if f)} for g in grupos]}
     (salida / "informe.json").write_text(json.dumps(resultado, indent=1, ensure_ascii=False, default=str))
@@ -655,7 +660,7 @@ def decidir(a):
     return 0
 
 
-def informe_md(decision, motivo, saludes, grupos, sin_cobertura, avisos, errores, propuestas, meta, pol, diferencial):
+def informe_md(decision, motivo, saludes, grupos, corregidas, sin_cobertura, avisos, errores, propuestas, meta, pol, diferencial):
     icono = {"PASA": "✅", "AVISO": "⚠️", "BLOQUEA": "⛔", "ERROR": "❌"}[decision]
     l = [f"## {icono} sca-gate {decision}", "", motivo + ".", ""]
     if diferencial:
@@ -682,6 +687,8 @@ def informe_md(decision, motivo, saludes, grupos, sin_cobertura, avisos, errores
 
     for titulo, lista in (("Manifiestos que ninguna herramienta ha analizado", sin_cobertura),
                           ("Avisos", avisos + errores),
+                          ("Vulnerabilidades que corrige la PR",
+                           sorted({f"{c['id']} en {c['paquete']}@{c['version']}" for c in corregidas})),
                           ("Excepciones que propone la PR (no se aplican hasta fusionarlas)",
                            [f"{p['id']} hasta {p['caduca']}, {p['motivo']}" for p in propuestas])):
         if lista:
