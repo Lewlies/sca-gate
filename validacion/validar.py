@@ -6,6 +6,7 @@ de EPSS y KEV que uso la puerta, asi que una diferencia solo puede venir de lo q
 detectaron las herramientas.
 
     python3 validacion/validar.py comprobar --informe DIR --repo synthetic-npm-mixed --salida res.json
+    python3 validacion/validar.py comprobar --esperado validacion/holdout.json --informe DIR --repo holdout-npm-mixed --salida res.json
     python3 validacion/validar.py resumen DIR_CON_RESULTADOS
 """
 
@@ -36,8 +37,8 @@ def coincide(esperado, grupo):
     return mismo_paquete and misma_version and bool(set(esperado["ids"]) & set(grupo["ids"]))
 
 
-def comprobar(dir_informe, repo):
-    esperado = next(r for r in json.loads(ESPERADO.read_text())["repos"] if r["repo"] == repo)
+def comprobar(dir_informe, repo, fichero=ESPERADO):
+    esperado = next(r for r in json.loads(Path(fichero).read_text())["repos"] if r["repo"] == repo)
     informe = json.loads((Path(dir_informe) / "informe.json").read_text())
     res = {"repo": repo, "decision_gate": informe["decision"]}
     fallos = [h for h, s in informe["herramientas"].items() if s["estado"] == "FALLO"]
@@ -74,12 +75,23 @@ def comprobar(dir_informe, repo):
     extra = [f"{g['id']} en {g['paquete']}" for g in grupos
              if g["nivel"] in ("BLOQUEO", "AVISO") and not any(coincide(p, g) for p in documentados)]
 
+    # la decision puede coincidir aunque falte un objetivo, si otro hallazgo ya decide
+    objetivos = [f"{p['ids'][0]} en {p['paquete']}" for p in esperado["presentes"]
+                 if p.get("tipo") == "objetivo" and not any(coincide(p, x) for x in grupos)]
+    res["objetivos_no_detectados"] = objetivos
+    # lado corregido de un borde o aviso retirado que la puerta cuenta como vulnerabilidad
+    falsos = [f"{g['id']} en {g['paquete']} {g['version']}" for g in grupos
+              if any(coincide(a, g) for a in esperado["ausentes"])]
+    res["falsos_positivos"] = falsos
+    notas = "; ".join(filter(None, ["objetivo no detectado " + ", ".join(objetivos) if objetivos else "",
+                                     "falso positivo " + ", ".join(falsos) if falsos else ""]))
+
     if res["decision_gate"] == res["decision_oraculo"]:
-        return {**res, "veredicto": "COINCIDE", "motivo": ""}
+        return {**res, "veredicto": "COINCIDE", "motivo": notas}
     if no_vistos or extra:
         motivo = "; ".join(filter(None, ["no detectadas " + ", ".join(no_vistos) if no_vistos else "",
                                           "no documentadas en el ground truth " + ", ".join(extra) if extra else ""]))
-        return {**res, "veredicto": "DISCREPA_EXPLICADA", "motivo": motivo}
+        return {**res, "veredicto": "DISCREPA_EXPLICADA", "motivo": "; ".join(filter(None, [motivo, notas]))}
     return {**res, "veredicto": "DISCREPA", "motivo": "la decision difiere sin explicacion"}
 
 
@@ -98,11 +110,12 @@ if __name__ == "__main__":
     p.add_argument("--informe", required=True)
     p.add_argument("--repo", required=True)
     p.add_argument("--salida", required=True)
+    p.add_argument("--esperado", default=ESPERADO)
     p = sub.add_parser("resumen")
     p.add_argument("carpeta")
     a = ap.parse_args()
     if a.orden == "resumen":
         sys.exit(resumen(a.carpeta))
-    r = comprobar(a.informe, a.repo)
+    r = comprobar(a.informe, a.repo, a.esperado)
     Path(a.salida).write_text(json.dumps(r, ensure_ascii=False))
     print(f"{r['repo']} {r['veredicto']} {r['motivo']}")

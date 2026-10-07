@@ -1,0 +1,66 @@
+# Validacion sobre el conjunto de reserva: 6 repositorios sinteticos que no se usaron para disenar sca-gate.
+# Su ground truth (validacion/holdout.json) se escribio antes de la primera ejecucion.
+name: holdout
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency: validacion
+
+jobs:
+  holdout:
+    name: ${{ matrix.repo }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        include:
+          - { repo: holdout-npm-mixed, sha: 0122885379687ff46065483398dd7d73c766baec }
+          - { repo: holdout-npm-boundary, sha: 2f2f4a3d9a1ac50e478fa6c08ac32cced34d53e0 }
+          - { repo: holdout-pypi-mixed, sha: a7d9ac224acaa921e241735fa3d0e7fd3d893030 }
+          - { repo: holdout-pypi-boundary, sha: 113fa64de2629194d89361f12f6070119b9ee71e }
+          - { repo: holdout-maven-mixed, sha: ac3b5ba483df408456b6c1c7a76b2b5a9c9355ed }
+          - { repo: holdout-maven-boundary, sha: 5bf2c7f3dd36ee54e453c65d2c1c6158182f1292 }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: gate
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: Lewlies/${{ matrix.repo }}
+          ref: ${{ matrix.sha }}
+          path: objetivo
+          persist-credentials: false
+      - uses: ./gate
+        with:
+          ruta: objetivo
+          excepciones: ""
+          modo: avisar
+          fallo-herramienta: aviso
+          artefacto: informe-${{ matrix.repo }}
+      - if: always()
+        run: python3 gate/validacion/validar.py comprobar --esperado gate/validacion/holdout.json --informe "$RUNNER_TEMP/informe" --repo "${{ matrix.repo }}" --salida "${{ matrix.repo }}.json"
+      - if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: holdout-${{ matrix.repo }}
+          path: ${{ matrix.repo }}.json
+
+  resumen:
+    needs: holdout
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: holdout-*
+          path: resultados
+      - run: python3 validacion/validar.py resumen resultados | tee -a "$GITHUB_STEP_SUMMARY"
