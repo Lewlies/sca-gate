@@ -1,4 +1,4 @@
-# Pruebas unitarias y validacion sobre los 12 repositorios sinteticos del TFG, fijados por SHA.
+# Pruebas unitarias de sca-gate. La validacion sobre datos no usados en el diseno esta en holdout.yml.
 name: validacion
 
 on:
@@ -9,9 +9,6 @@ on:
 permissions:
   contents: read
 
-# dos ejecuciones a la vez provocan el 429 de Maven Central
-concurrency: validacion
-
 jobs:
   pruebas:
     runs-on: ubuntu-24.04
@@ -20,64 +17,3 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 -m unittest -v test_sca_gate.py
-
-  sintetico:
-    needs: pruebas
-    name: ${{ matrix.repo }}
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      max-parallel: 3  # Maven Central limita si se lanzan muchos a la vez
-      matrix:
-        include:
-          - { repo: synthetic-npm-mixed, sha: 441e477f26584c9c57f4aae4bb335560b4df9cc4 }
-          - { repo: synthetic-npm-boundary-vulnerable, sha: 72cd9db91147d5918e9031f4c37d8a8431026087 }
-          - { repo: synthetic-npm-boundary-patched, sha: 9f3c76819079672cfa76a6039e358225994611f0 }
-          - { repo: synthetic-npm-control, sha: 7a81aec1b1f20675c608d251dfabae7866f987ab }
-          - { repo: synthetic-pypi-mixed, sha: 116d94a2363576869fdd45a6f70136cc7031feb4 }
-          - { repo: synthetic-pypi-boundary-vulnerable, sha: 5b636b74ed197bc4b1fb69df6ec1493012fb5776 }
-          - { repo: synthetic-pypi-boundary-patched, sha: b6a9f4475e35356b9dfa8cd1b39e69151b4a2091 }
-          - { repo: synthetic-pypi-control, sha: fedb99cf6855b196abbcdc348f68dbfe986e7452 }
-          - { repo: synthetic-maven-mixed, sha: 6706595ef24ed88e86b7eb823325393fc5f4d98f }
-          - { repo: synthetic-maven-boundary-vulnerable, sha: 2754a5a827d3a5de20b23369234158042992b31c }
-          - { repo: synthetic-maven-boundary-patched, sha: 54e109b2c5cb3ec6a4632c2af998babcd59f50db }
-          - { repo: synthetic-maven-control, sha: 765f34d27042e7fcb435d5a28f3281991137aaa7 }
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          path: gate
-          persist-credentials: false
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: Lewlies/${{ matrix.repo }}
-          ref: ${{ matrix.sha }}
-          path: objetivo
-          persist-credentials: false
-      - uses: ./gate
-        with:
-          ruta: objetivo
-          excepciones: ""
-          modo: avisar
-          fallo-herramienta: aviso
-          artefacto: informe-${{ matrix.repo }}
-      - if: always()
-        run: python3 gate/validacion/validar.py comprobar --informe "$RUNNER_TEMP/informe" --repo "${{ matrix.repo }}" --salida "${{ matrix.repo }}.json"
-      - if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: validacion-${{ matrix.repo }}
-          path: ${{ matrix.repo }}.json
-
-  resumen:
-    needs: sintetico
-    if: always()
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          pattern: validacion-*
-          path: resultados
-      - run: python3 validacion/validar.py resumen resultados | tee -a "$GITHUB_STEP_SUMMARY"

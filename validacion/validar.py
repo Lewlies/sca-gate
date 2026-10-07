@@ -12,6 +12,7 @@ detectaron las herramientas.
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -30,10 +31,15 @@ def decision(niveles):
     return "PASA"
 
 
+def version(v):
+    # OSV-Scanner normaliza 2.10 como 2.10.0
+    return re.sub(r"(\.0)+$", "", str(v or "").lower())
+
+
 def coincide(esperado, grupo):
     a, b = esperado["paquete"].lower(), grupo["paquete"].lower()
     mismo_paquete = a == b or a.split(":")[-1] == b.split(":")[-1]
-    misma_version = not esperado["version"] or not grupo["version"] or esperado["version"] == grupo["version"]
+    misma_version = not esperado["version"] or not grupo["version"] or version(esperado["version"]) == version(grupo["version"])
     return mismo_paquete and misma_version and bool(set(esperado["ids"]) & set(grupo["ids"]))
 
 
@@ -72,7 +78,7 @@ def comprobar(dir_informe, repo, fichero=ESPERADO):
     res["decision_oraculo"] = decision(niveles)
 
     documentados = esperado["presentes"] + esperado["ausentes"]
-    extra = [f"{g['id']} en {g['paquete']}" for g in grupos
+    extra = [f"{g['id']} en {g['paquete']} {g['version']}" for g in grupos
              if g["nivel"] in ("BLOQUEO", "AVISO") and not any(coincide(p, g) for p in documentados)]
 
     # la decision puede coincidir aunque falte un objetivo, si otro hallazgo ya decide
@@ -84,13 +90,13 @@ def comprobar(dir_informe, repo, fichero=ESPERADO):
               if any(coincide(a, g) for a in esperado["ausentes"])]
     res["falsos_positivos"] = falsos
     notas = "; ".join(filter(None, ["objetivo no detectado " + ", ".join(objetivos) if objetivos else "",
-                                     "falso positivo " + ", ".join(falsos) if falsos else ""]))
+                                     "falso positivo " + ", ".join(falsos) if falsos else "",
+                                     "no documentadas " + ", ".join(extra) if extra else ""]))
 
     if res["decision_gate"] == res["decision_oraculo"]:
         return {**res, "veredicto": "COINCIDE", "motivo": notas}
     if no_vistos or extra:
-        motivo = "; ".join(filter(None, ["no detectadas " + ", ".join(no_vistos) if no_vistos else "",
-                                          "no documentadas en el ground truth " + ", ".join(extra) if extra else ""]))
+        motivo = "no detectadas " + ", ".join(no_vistos) if no_vistos else ""
         return {**res, "veredicto": "DISCREPA_EXPLICADA", "motivo": "; ".join(filter(None, [motivo, notas]))}
     return {**res, "veredicto": "DISCREPA", "motivo": "la decision difiere sin explicacion"}
 

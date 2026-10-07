@@ -74,4 +74,8 @@ python3 sca_gate.py decidir --salida informe
 
 ## Validación
 
-`.github/workflows/validacion.yml` pasa las pruebas (`python3 -m unittest test_sca_gate.py`) y escanea los 12 repositorios sintéticos del TFG. La decisión de cada uno se compara con la de la misma política aplicada a su ground truth (`validacion/esperado.json`) con la misma instantánea de EPSS y KEV.
+`.github/workflows/validacion.yml` pasa las pruebas (`python3 -m unittest test_sca_gate.py`).
+
+`.github/workflows/holdout.yml` escanea los 6 repositorios de reserva del TFG, que no se usaron para diseñar la herramienta, y compara la decisión de cada uno con la de la misma política aplicada a su ground truth (`validacion/holdout.json`) con la misma instantánea de EPSS y KEV.
+
+`validacion/esperado.json` es el ground truth de los 12 repositorios sintéticos con los que se diseñó. Son privados, así que se comprueban en local escaneando cada uno y pasando el informe a `validacion/validar.py comprobar`.
